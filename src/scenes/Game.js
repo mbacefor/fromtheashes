@@ -9,6 +9,10 @@ export class Game extends Scene {
   arrayMedium = [0, 1, 2, 3, 4];
   arrayHard = [0, 1, 2, 3, 4];
 
+  clockSize = 50;
+  timerEvent;
+  graphics;
+
   create() {
     this.timerEvent = this.time.addEvent({ delay: 15000 });
     this.graphics = this.add.graphics({ x: 0, y: 0 });
@@ -852,6 +856,11 @@ export class Game extends Scene {
     //  The current iteration hand
     size = this.clockSize * 0.95;
 
+    if (!(timer.getProgress() < 1)) {
+      setTimeout(() => {
+        this.scene.start("GameOver");
+      }, 1500); // aqui em vez de restartar toda esta cena eu apenas chamo de novo a função que vai montar outro labirinto
+    }
     angle = 360 * timer.getProgress() - 90;
     dest = Phaser.Math.RotateAroundDistance(
       { x: x, y: y },
