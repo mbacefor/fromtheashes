@@ -5,7 +5,7 @@ export class Preloader extends Scene {
     super("Preloader");
   }
 
-  init() {
+ /*  init() {
     //  We loaded this image in our Boot Scene, so we can display it here
     this.add.image(512, 384, "background");
 
@@ -20,13 +20,13 @@ export class Preloader extends Scene {
       //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
       bar.width = 4 + 460 * progress;
     });
-  }
+  } */
 
   preload() {
     //  Load the assets for the game - Replace with your own assets
     this.load.setPath("assets");
 
-    this.load.image("logo", "logo.png");
+    //this.load.image("logo", "logo.png");
     this.load.image("chao", "bloco-espaco-40px.png");
     this.load.image("pareide", "bloco-pareide-40px.png");
     this.load.image("tempo", "cronometro.png");
