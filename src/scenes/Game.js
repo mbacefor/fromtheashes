@@ -720,6 +720,181 @@ export class Game extends Scene {
     //setTimeout(() => { this.scene.start("GameEasy") }, 10000)
   }
 
+  update() {
+    this.graphics.clear();
+    this.drawClock(100, 100, this.timerEvent);
+
+    setTimeout(() => {
+      this.trocarChaoParede(this.todos_blocos_parede, this.chao);
+    }, 5000);
+
+    if (!this.acabou) {
+      // feito evitar que o jogador consiga se movimentar depois que acontecer o overlap
+
+      if (this.flag === 2) {
+        if (this.cursors.left.isDown) {
+          this.jogadorr.setVelocityX(-195);
+        } else if (this.cursors.right.isDown) {
+          this.jogadorr.setVelocityX(195);
+        } else {
+          this.jogadorr.setVelocityX(0);
+        }
+
+        if (this.cursors.up.isDown) {
+          this.jogadorr.setVelocityY(-195);
+        } else if (this.cursors.down.isDown) {
+          this.jogadorr.setVelocityY(195);
+        } else {
+          this.jogadorr.setVelocityY(0);
+        }
+      } else {
+        if (this.cursors.left.isDown) {
+          this.jogadorr.setVelocityX(-700);
+        } else if (this.cursors.right.isDown) {
+          this.jogadorr.setVelocityX(700);
+        } else {
+          this.jogadorr.setVelocityX(0);
+        }
+
+        if (this.cursors.up.isDown) {
+          this.jogadorr.setVelocityY(-700);
+        } else if (this.cursors.down.isDown) {
+          this.jogadorr.setVelocityY(700);
+        } else {
+          this.jogadorr.setVelocityY(0);
+        }
+      }
+      /*
+      if (arrayEasy.length === 0) {
+        arrayEasy = [0, 1, 2, 3, 4]
+      }
+*/
+      if (this.arrayNiveis.length === 0) {
+        this.arrayNiveis = [1, 2];
+      }
+    }
+  }
+
+  trocarChaoParede(grupo_parede, grupo_espaco) {
+    grupo_parede.getChildren().forEach((elemento) => {
+      elemento.setTint(0xffffff);
+    });
+
+    grupo_espaco.setTint(0x000000);
+
+    console.log("entrou");
+  }
+
+  destrocarChaoParede(grupo_parede, grupo_espaco) {
+    grupo_parede.getChildren().forEach((elemento) => {
+      elemento.setTint(0x000000);
+    });
+
+    grupo_espaco.setTint(0xffffff);
+  }
+
+  saiuDoLabirinto(jogadorr, saida) {
+    let x = saida.x;
+    let y = saida.y;
+
+    this.jogadorr.destroy();
+    this.saida.destroy();
+
+    //this.saiu_do_labirinto = this.physics.add.sprite( colunaF * 120 + (config.width/3) - 79.5  , ( linhaF * 120 ) + 0.5,"saiuDoLabirinto").setOrigin(0,0).setScale(0.2).refreshBody();
+
+    if (this.flag === 2) {
+      // quando for adicionar este sprite no labirinto dificil ele vai encaixar dentro do bloco espaço
+      this.saiu_do_labirinto = this.physics.add
+        .sprite(x, y, "saiuDoLabirinto")
+        .setScale(this.scale_passado_labirinto)
+        .refreshBody();
+    } else {
+      // quando for adicionar este sprite no labirinto facil e medio vai encaixar dentro do bloco espaço
+      this.saiu_do_labirinto = this.physics.add
+        .sprite(x, y, "saiuDoLabirinto")
+        .setOrigin(0, 0)
+        .setScale(this.scale_passado_labirinto)
+        .refreshBody();
+    }
+
+    this.physics.add.collider(this.saiu_do_labirinto, this.todos_blocos_parede);
+
+    this.anims.create({
+      key: "saiuDoLabirinto_anims",
+      frames: this.anims.generateFrameNumbers("saiuDoLabirinto"),
+      frameRate: 15,
+      repeat: -1,
+    });
+
+    this.saiu_do_labirinto.anims.play("saiuDoLabirinto_anims", true);
+
+    // executar a funcao que mostra que a pessoa passou de fase
+    this.acabou = true;
+
+    setTimeout(() => {
+      this.scene.start("Game");
+    }, 1500); // aqui em vez de restartar toda esta cena eu apenas chamo de novo a função que vai montar outro labirinto
+  }
+
+  drawClock(x, y, timer) {
+    //  Progress is between 0 and 1, where 0 = the hand pointing up and then rotating clockwise a full 360
+
+    //  The frame
+    this.graphics.lineStyle(6, 0xffffff, 1);
+    this.graphics.strokeCircle(x, y, this.clockSize);
+
+    let angle;
+    let dest;
+    let p1;
+    let p2;
+    let size;
+
+    //  The current iteration hand
+    size = this.clockSize * 0.95;
+
+    angle = 360 * timer.getProgress() - 90;
+    dest = Phaser.Math.RotateAroundDistance(
+      { x: x, y: y },
+      x,
+      y,
+      Phaser.Math.DegToRad(angle),
+      size
+    );
+
+    this.graphics.lineStyle(2, 0xffffff, 1);
+
+    this.graphics.beginPath();
+
+    this.graphics.moveTo(x, y);
+
+    p1 = Phaser.Math.RotateAroundDistance(
+      { x: x, y: y },
+      x,
+      y,
+      Phaser.Math.DegToRad(angle - 5),
+      size * 0.7
+    );
+
+    this.graphics.lineTo(p1.x, p1.y);
+    this.graphics.lineTo(dest.x, dest.y);
+
+    this.graphics.moveTo(x, y);
+
+    p2 = Phaser.Math.RotateAroundDistance(
+      { x: x, y: y },
+      x,
+      y,
+      Phaser.Math.DegToRad(angle + 5),
+      size * 0.7
+    );
+
+    this.graphics.lineTo(p2.x, p2.y);
+    this.graphics.lineTo(dest.x, dest.y);
+
+    this.graphics.strokePath();
+    this.graphics.closePath();
+  }
+
   // create ()
   // {
   //     this.cameras.main.setBackgroundColor(0x00ff00);
